@@ -105,7 +105,7 @@ app.get('/api/admin/clients', (req, res) => {
   );
 });
 
-// Aggiunta cliente di test (puoi rimuoverlo in produzione)
+// Aggiunta cliente
 app.post('/api/add-client', (req, res) => {
   const { username, password } = req.body;
   const hashed = bcrypt.hashSync(password, 10);
@@ -170,7 +170,6 @@ app.get('/api/appointments/slots', (req, res) => {
     }
   );
 });
-
 
 // =======================
 //   PRENOTAZIONI
@@ -272,10 +271,36 @@ app.post('/api/admin/appointments/:id/reject', (req, res) => {
   );
 });
 
+// 5) Cliente: tutti i suoi appuntamenti (per username)
+app.get('/api/appointments/my', (req, res) => {
+  const username = req.query.username;
+
+  if (!username) {
+    return res.status(400).json({ error: 'Missing username' });
+  }
+
+  db.get('SELECT id FROM users WHERE username = ?', [username], (err, user) => {
+    if (err || !user) {
+      return res.status(400).json({ error: 'Utente non trovato' });
+    }
+
+    db.all(
+      `SELECT id, service, date, time, note, status, created_at
+       FROM appointments
+       WHERE user_id = ?
+       ORDER BY date ASC, time ASC`,
+      [user.id],
+      (err2, rows) => {
+        if (err2) return res.status(500).json({ error: err2.message });
+        res.json(rows);
+      }
+    );
+  });
+});
+
 // =======================
 //   OAUTH GOOGLE
 // =======================
-
 app.get('/oauth2callback', (req, res) => {
   const code = req.query.code;
   if (!code) return res.status(400).send('Missing code');
@@ -285,7 +310,4 @@ app.get('/oauth2callback', (req, res) => {
 // =======================
 //   AVVIO SERVER
 // =======================
-
-
-
 app.listen(3000, () => console.log('🚀 Server Lidia: http://localhost:3000'));
