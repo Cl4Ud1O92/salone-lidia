@@ -4,6 +4,7 @@ const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { saveTokenFromCode, createEvent } = require('./googleCalendar');
+const { sendWhatsApp } = require('./whatsapp'); // <--- NUOVO
 
 const app = express();
 app.use(cors());
@@ -216,7 +217,7 @@ app.get('/api/admin/appointments', (req, res) => {
   );
 });
 
-// 3) Admin: conferma appuntamento → Google Calendar + status=confirmed
+// 3) Admin: conferma appuntamento → Google Calendar + status=confirmed + WhatsApp
 app.post('/api/admin/appointments/:id/confirm', (req, res) => {
   const id = req.params.id;
 
@@ -240,12 +241,22 @@ app.post('/api/admin/appointments/:id/confirm', (req, res) => {
       };
 
       createEvent(event)
-        .then((ev) => {
+        .then(async (ev) => {
           db.run(
             'UPDATE appointments SET status = ? WHERE id = ?',
             ['confirmed', id],
-            (err2) => {
+            async (err2) => {
               if (err2) return res.status(500).json({ error: err2.message });
+
+              // NOTIFICA WHATSAPP (numero test tuo)
+              try {
+                const toWhatsApp = 'whatsapp:+393509628358';
+                const text = `Ciao ${a.username}, il tuo appuntamento per "${a.service}" del ${a.date} alle ${a.time} è stato CONFERMATO. A presto da Lidia Z. Parrucchieri.`;
+                await sendWhatsApp(toWhatsApp, text);
+              } catch (wErr) {
+                console.error('Errore invio WhatsApp:', wErr);
+              }
+
               res.json({ success: true, eventId: ev.id });
             }
           );
