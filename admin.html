@@ -109,7 +109,7 @@
         // ===== CLIENTI =====
         async function loadClients() {
             try {
-                const res = await fetch('http://localhost:3000/api/admin/clients', {
+                const res = await fetch('https://lidia-backend.onrender.com/api/admin/clients', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const clients = await res.json();
@@ -138,7 +138,7 @@
             if (!password) return;
 
             try {
-                const res = await fetch('http://localhost:3000/api/add-client', {
+                const res = await fetch('https://lidia-backend.onrender.com/api/add-client', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password })
@@ -159,7 +159,7 @@
         // ===== APPUNTAMENTI =====
         async function loadAppointments() {
             try {
-                const res = await fetch('http://localhost:3000/api/admin/appointments', {
+                const res = await fetch('https://lidia-backend.onrender.com/api/admin/appointments', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const apps = await res.json();
@@ -216,7 +216,7 @@
         async function confirmApp(id) {
             if (!confirm('Confermare questo appuntamento e inserirlo in Google Calendar?')) return;
             try {
-                const res = await fetch(`http://localhost:3000/api/admin/appointments/${id}/confirm`, {
+                const res = await fetch(`https://lidia-backend.onrender.com/api/admin/appointments/${id}/confirm`, {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
@@ -240,7 +240,7 @@
         async function rejectApp(id) {
             if (!confirm('Rifiutare questo appuntamento?')) return;
             try {
-                const res = await fetch(`http://localhost:3000/api/admin/appointments/${id}/reject`, {
+                const res = await fetch(`https://lidia-backend.onrender.com/api/admin/appointments/${id}/reject`, {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
@@ -261,7 +261,7 @@
             }
         }
 
-        // Carica dati all’avvio
+        // Carica dati all'avvio
         loadClients();
         loadAppointments();
     </script>

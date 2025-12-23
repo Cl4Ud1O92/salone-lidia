@@ -168,7 +168,7 @@
             if (!date) return;
 
             try {
-                const res = await fetch(`http://localhost:3000/api/appointments/slots?date=${date}`);
+                const res = await fetch(`https://lidia-backend.onrender.com/api/appointments/slots?date=${date}`);
                 const slots = await res.json();
 
                 if (!Array.isArray(slots) || slots.length === 0) {
@@ -217,7 +217,7 @@
             }
 
             try {
-                const res = await fetch('http://localhost:3000/api/appointments/request', {
+                const res = await fetch('https://lidia-backend.onrender.com/api/appointments/request', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ service, date, time, note, clientName })
